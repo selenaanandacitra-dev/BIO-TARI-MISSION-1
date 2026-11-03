@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIO-TARI MISSION</title>
+<style>
+:root{--sage:#dfe8dc;--sage2:#829b83;--dark:#344b3d;--gold:#c6a76a;--cream:#fbf8ef;--ink:#26352b}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;font-family:Arial,sans-serif;background:linear-gradient(180deg,#f8f5eb 0%,#e5ecdf 100%);color:var(--ink)}
+.game{max-width:760px;margin:auto;background:#fffdf8;border:1px solid #d9dfd2;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px #344b3d18}
+header{padding:25px 22px;background:linear-gradient(120deg,#dce7d9,#f4edda);text-align:center}
+header .eyebrow{letter-spacing:2px;font-size:11px;font-weight:bold;color:#627a64}
+h1{margin:8px 0;color:var(--dark);font-size:clamp(25px,5vw,36px)}
+header p{margin:5px auto 0;max-width:540px;line-height:1.5;color:#526653}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:17px}
+.stat{background:#ffffffc9;border:1px solid #d8dfd2;padding:8px 14px;border-radius:30px;font-size:13px}
+main{padding:22px}
+.progress{height:9px;background:#e9ede5;border-radius:20px;overflow:hidden;margin:8px 0 20px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#78947b,#c6a76a);transition:.3s}
+.levels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.level{border:1px solid #dce3d7;border-radius:15px;padding:16px;background:#fff;display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;color:var(--ink);min-height:92px}
+.level:disabled{cursor:not-allowed;opacity:.58;background:#f3f4f0}
+.level:not(:disabled):hover{border-color:var(--sage2);transform:translateY(-1px)}
+.level .symbol{font-size:25px}
+.level strong{display:block;color:var(--dark);font-size:14px;margin-bottom:5px}
+.level small{color:#69776b;line-height:1.35}
+.tag{display:inline-block;margin-top:7px;font-size:10px;font-weight:bold;letter-spacing:.5px;color:#657c67}
+.panel{border:1px solid #dce3d7;border-radius:17px;padding:20px;background:#fff}
+.kicker{font-size:11px;letter-spacing:1.3px;font-weight:bold;color:#718a72}
+h2{color:var(--dark);margin:8px 0 5px;font-size:22px}
+.topic{color:#718071;font-size:13px;margin:0 0 18px}
+.question{font-size:17px;line-height:1.55;font-weight:600;margin:15px 0}
+.options{display:grid;gap:10px}
+.option{display:flex;gap:11px;align-items:flex-start;border:1px solid #dce3d7;border-radius:12px;padding:13px;cursor:pointer;line-height:1.4}
+.option:hover{background:#f7f9f4}
+.option input{accent-color:#66866c;margin-top:3px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button.primary,button.secondary{border:0;border-radius:11px;padding:12px 17px;font-weight:bold;cursor:pointer;font-size:14px}
+.primary{background:var(--dark);color:white;flex:1}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.secondary{background:#edf1e9;color:var(--dark)}
+.feedback{margin-top:16px;padding:14px;border-radius:12px;background:#f0f4ed;line-height:1.5;font-size:14px}
+.feedback.bad{background:#fff3e7}
+.hidden{display:none!important}
+footer{text-align:center;padding:0 20px 20px;color:#7a867b;font-size:11px}
+@media(max-width:520px){body{padding:10px}.levels{grid-template-columns:1fr}main{padding:16px}.level{min-height:75px}}
+</style>
+</head>
+<body>
+<div class="game">
+<header>
+  <div class="eyebrow">PETUALANGAN BIOLOGI • KELAS XI</div>
+  <h1>🌿 BIO-TARI MISSION</h1>
+  <p>Jelajahi sistem gerak manusia melalui Tari Persembahan Riau. Selesaikan tantangan untuk membuka level berikutnya!</p>
+  <div class="stats">
+    <div class="stat">🏅 Skor: <b id="score">0</b>/100</div>
+    <div class="stat">🔓 Level terbuka: <b id="unlocked">1</b>/4</div>
+  </div>
+</header>
+<main>
+  <section id="map">
+    <h2>Peta Misi</h2>
+    <p class="topic">Selesaikan setiap level secara berurutan. Jawaban salah? Coba lagi sampai benar.</p>
+    <div class="progress"><div class="bar" id="progress"></div></div>
+    <div class="levels" id="levels"></div>
+  </section>
+  <section id="play" class="panel hidden">
+    <div class="kicker" id="levelNo">LEVEL 1</div>
+    <h2 id="levelTitle"></h2>
+    <p class="topic" id="topic"></p>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+    <div class="actions">
+      <button class="primary" id="check" disabled>Periksa Jawaban</button>
+      <button class="secondary" id="back">Kembali ke Peta</button>
+      <button class="primary hidden" id="next">Buka Level Berikutnya →</button>
+      <button class="primary hidden" id="retry">Coba Lagi</button>
+    </div>
+  </section>
+  <section id="complete" class="panel hidden" style="text-align:center">
+    <div style="font-size:48px">🏆</div>
+    <h2>MISSION COMPLETED!</h2>
+    <p>Hebat! Kamu telah menyelesaikan seluruh tantangan BIO-TARI MISSION.</p>
+    <h2 style="font-size:34px" id="finalScore">100/100</h2>
+    <p class="topic">Kamu telah menuntaskan empat tujuan pembelajaran sistem gerak manusia.</p>
+    <button class="primary" id="restart">Ulangi Permainan</button>
+  </section>
+</main>
+<footer>BIO-TARI QUEST • Sistem Gerak Manusia Terintegrasi Kearifan Lokal Tari Persembahan Riau</footer>
+</div>
+<script>
+const missions = [
+ {title:"Bone Explorer",topic:"Tujuan 1 • Hubungan tulang, persendian, dan otot",q:"Saat lengan ditekuk pada sendi siku, bagaimana otot bisep membantu menghasilkan gerakan?",opts:["Otot bisep berkontraksi dan menarik tulang lengan bawah","Tulang berkontraksi untuk menarik otot","Sendi menghasilkan energi untuk menggerakkan tulang","Otot bisep dan trisep selalu berkontraksi maksimal bersamaan"],a:0,why:"Otot bisep berkontraksi dan menarik tulang lengan bawah melalui tendon sehingga siku menekuk. Pada gerak ini, otot trisep berelaksasi."},
+ {title:"Dance Detective",topic:"Tujuan 2 • Analisis gerak Tari Persembahan Riau",q:"Pada gerak lenggang, penari mengayunkan lengan ke berbagai arah. Sendi yang paling memungkinkan gerakan lengan ke berbagai arah adalah ...",opts:["Sendi engsel pada siku","Sendi putar pada leher","Sendi peluru pada bahu","Sendi mati pada tengkorak"],a:2,why:"Sendi peluru pada bahu memungkinkan lengan bergerak ke berbagai arah, termasuk mengayun dan memutar."},
+ {title:"Movement Rescue",topic:"Tujuan 3 • Analisis masalah dan gangguan sistem gerak",q:"Seorang penari mengalami nyeri lutut setelah latihan berulang dengan posisi lutut yang kurang tepat. Tindakan paling tepat adalah ...",opts:["Mengabaikan nyeri dan terus berlatih","Menambah beban latihan agar lutut terbiasa","Mengevaluasi teknik dan beban latihan serta memeriksakan keluhan jika berlanjut","Menghindari semua aktivitas fisik selamanya"],a:2,why:"Teknik gerak dan beban latihan perlu dievaluasi. Jika nyeri menetap atau memburuk, penari sebaiknya berkonsultasi dengan tenaga kesehatan."},
+ {title:"Guardian of Movement",topic:"Tujuan 4 • Evaluasi upaya menjaga kesehatan sistem gerak",q:"Kamu menjadi pelatih Tari Persembahan Riau. Program yang paling tepat untuk menjaga kesehatan sistem gerak penari adalah ...",opts:["Latihan berat setiap hari tanpa jeda","Pemanasan, teknik gerak yang benar, gizi seimbang, hidrasi, dan istirahat cukup","Berlatih hanya menjelang pertunjukan","Menghindari semua gerakan di luar latihan tari"],a:1,why:"Pemanasan, teknik yang benar, gizi seimbang, hidrasi, dan istirahat cukup membantu menjaga fungsi tulang, otot, serta persendian."}
+];
+let unlocked=0,score=0,current=0,selected=null,answered=false;
+const $=id=>document.getElementById(id);
+function renderMap(){
+ $('map').classList.remove('hidden');$('play').classList.add('hidden');$('complete').classList.add('hidden');
+ $('score').textContent=score;$('unlocked').textContent=Math.min(unlocked+1,4);
+ $('progress').style.width=(unlocked/4*100)+'%';
+ $('levels').innerHTML='';
+ missions.forEach((m,i)=>{
+  const b=document.createElement('button');b.className='level';b.disabled=i>unlocked;
+  const symbol=i<unlocked?'🏆':i===unlocked?'🔓':'🔒';
+  b.innerHTML=`<span class="symbol">${symbol}</span><span><strong>Level ${i+1} – ${m.title}</strong><small>${m.topic}</small><span class="tag">${i<unlocked?'SELESAI':i===unlocked?'MULAI MISI':'TERKUNCI'}</span></span>`;
+  b.addEventListener('click',()=>startLevel(i));$('levels').appendChild(b);
+ });
+ if(unlocked===4){$('map').classList.add('hidden');$('complete').classList.remove('hidden');$('finalScore').textContent=score+'/100';}
+}
+function startLevel(i){
+ current=i;selected=null;answered=false;
+ $('map').classList.add('hidden');$('complete').classList.add('hidden');$('play').classList.remove('hidden');
+ const m=missions[i];$('levelNo').textContent='LEVEL '+(i+1);$('levelTitle').textContent=m.title;$('topic').textContent=m.topic;$('question').textContent=m.q;
+ $('options').innerHTML='';
+ m.opts.forEach((op,j)=>{
+  const label=document.createElement('label');label.className='option';
+  const radio=document.createElement('input');radio.type='radio';radio.name='answer';radio.value=j;
+  radio.addEventListener('change',()=>{selected=j;$('check').disabled=false;});
+  const span=document.createElement('span');span.textContent=String.fromCharCode(65+j)+'. '+op;
+  label.append(radio,span);$('options').appendChild(label);
+ });
+ $('feedback').classList.add('hidden');$('feedback').classList.remove('bad');
+ $('check').classList.remove('hidden');$('check').disabled=true;$('next').classList.add('hidden');$('retry').classList.add('hidden');
+}
+$('check').addEventListener('click',()=>{
+ if(selected===null||answered)return;answered=true;
+ const m=missions[current],correct=selected===m.a,fb=$('feedback');
+ fb.classList.remove('hidden');fb.classList.toggle('bad',!correct);
+ fb.innerHTML=correct?'<b>✓ BENAR! Misi berhasil diselesaikan.</b><br>+25 poin. ':'<b>✗ Belum tepat. Level berikutnya masih terkunci.</b><br>';
+ fb.append(document.createTextNode(m.why));
+ $('check').classList.add('hidden');
+ if(correct){score+=25;unlocked=Math.max(unlocked,current+1);$('next').classList.remove('hidden');$('next').textContent=current===3?'Lihat Hasil Akhir →':'Buka Level Berikutnya →';}
+ else{$('retry').classList.remove('hidden');}
+});
+$('retry').addEventListener('click',()=>startLevel(current));
+$('next').addEventListener('click',()=>renderMap());
+$('back').addEventListener('click',renderMap);
+$('restart').addEventListener('click',()=>{unlocked=0;score=0;renderMap();});
+renderMap();
+</script>
+</body>
+</html>
